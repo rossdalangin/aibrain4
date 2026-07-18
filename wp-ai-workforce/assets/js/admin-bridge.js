@@ -695,21 +695,89 @@ function initNexusAdminBridge() {
     if (sendMeetingMsgBtn) {
         sendMeetingMsgBtn.addEventListener('click', function() {
             const input = document.getElementById('nexus-meeting-input');
-            if (!input.value) return;
-            chairmanMessage = input.value;
+            if (!input.value.trim()) return;
+            const interventionText = input.value.trim();
+            const invitees = Array.from(document.querySelectorAll('.nexus-meeting-invitee:checked')).map(cb => cb.value);
+
+            if (invitees.length === 0) {
+                showToast('Please select at least one participant first.', 'error');
+                return;
+            }
+
+            // Halt the ongoing default meeting round-robin loop
+            meetingPaused = true;
+
             const bubble = `<div class="flex gap-4 items-start justify-end animate-fade-in-up">
                 <div class="max-w-[80%] p-6 rounded-3xl bg-accent text-[#1e293b] shadow-xl">
                     <p class="text-[10px] font-bold uppercase mb-2">Chairman Instruction</p>
-                    <p class="text-sm leading-relaxed">${escapeHTML(input.value)}</p>
+                    <p class="text-sm leading-relaxed">${escapeHTML(interventionText)}</p>
                 </div>
             </div>`;
             document.getElementById('nexus-meeting-transcript').innerHTML += bubble;
             input.value = '';
-            showToast('Intervention recorded. AI agents will adjust in the next round.');
+
+            showToast('Strategic intervention dispatched to all participants.', 'info');
+
+            // Trigger each participant to answer the chairman in sequence
+            runChairmanIntervention(invitees, interventionText, 0);
+        });
+    }
+
+    function runChairmanIntervention(invitees, interventionText, index = 0) {
+        if (index >= invitees.length) {
+            document.getElementById('nexus-meeting-transcript').innerHTML += '<p class="text-green-500 font-bold text-center mt-10 uppercase tracking-widest">All participants have responded to the Chairman.</p>';
+            return;
+        }
+
+        const nextId = invitees[index];
+        const transcript = document.getElementById('nexus-meeting-transcript');
+        const thinkingId = 'nexus-thinking-' + Date.now();
+        const thinkingHtml = `
+            <div id="${thinkingId}" class="flex gap-6 items-start animate-fade-in-up">
+                <div class="w-12 h-12 rounded-full bg-nexus-elevated border border-accent animate-pulse"></div>
+                <div class="nexus-thinking-indicator mt-4">
+                    <span>Reasoning</span>
+                    <div class="thinking-dot"></div><div class="thinking-dot"></div><div class="thinking-dot"></div>
+                </div>
+            </div>`;
+        transcript.innerHTML += thinkingHtml;
+        transcript.scrollTop = transcript.scrollHeight;
+
+        const meetingPayload = {
+            agent_id: nextId,
+            agenda: "CHAIRMAN INTERVENTION: " + interventionText,
+            round: index + 1
+        };
+
+        nexusFetch( 'chat/meeting', 'POST', meetingPayload ).then(res => {
+            document.getElementById(thinkingId)?.remove();
+
+            const rawContent = res ? (res.content || res.message || res.error || '') : '';
+            const resContent = typeof rawContent === 'object' ? JSON.stringify(rawContent) : String(rawContent);
+
+            const colors = ['#7C3AED', '#0ea5e9', '#f59e0b', '#10b981', '#ef4444', '#f97316'];
+            const agentColor = colors[index % colors.length];
+            const agentName = res ? (res.agent_name || 'AI Agent') : 'AI Agent';
+            const positionName = res ? (res.position || 'Specialist') : 'Specialist';
+
+            const bubble = `<div class="flex gap-6 items-start animate-fade-in-up">
+                <div class="w-12 h-12 rounded-full shrink-0 flex items-center justify-center font-bold text-[#1e293b] shadow-xl" style="background-color: ${agentColor}">${escapeHTML(agentName[0])}</div>
+                <div class="flex-1 p-6 bg-[#f8fafc]/5 rounded-3xl border-l-4 shadow-2xl" style="border-color: ${agentColor}">
+                    <p class="text-[10px] text-gray-500 font-bold uppercase mb-2 tracking-widest">${escapeHTML(agentName)} • ${escapeHTML(positionName)}</p>
+                    <p class="text-sm text-gray-200 leading-relaxed whitespace-pre-wrap">${escapeHTML(resContent)}</p>
+                </div>
+            </div>`;
+            transcript.innerHTML += bubble;
+            transcript.scrollTop = transcript.scrollHeight;
+
+            setTimeout(() => runChairmanIntervention(invitees, interventionText, index + 1), 2000);
         });
     }
 
     function runMeetingRound(invitees, agenda, round = 1) {
+        if (meetingPaused) {
+            return;
+        }
         if (round > 5) {
             document.getElementById('nexus-meeting-transcript').innerHTML += '<p class="text-green-500 font-bold text-center mt-10 uppercase tracking-widest">Meeting Concluded. Strategic Consensus Finalized.</p>';
             document.getElementById('nexus-meeting-summarize')?.classList.remove('hidden');
