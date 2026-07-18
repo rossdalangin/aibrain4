@@ -697,16 +697,58 @@ function initNexusAdminBridge() {
             const input = document.getElementById('nexus-meeting-input');
             if (!input.value.trim()) return;
             const interventionText = input.value.trim();
-            const invitees = Array.from(document.querySelectorAll('.nexus-meeting-invitee:checked')).map(cb => cb.value);
 
-            if (invitees.length === 0) {
-                showToast('Please select at least one participant first.', 'error');
+            // Find all checked invitees first
+            let inviteeEls = Array.from(document.querySelectorAll('.nexus-meeting-invitee:checked'));
+            // Fallback: If no checkbox is checked, select all available checkboxes (all active participants)
+            if (inviteeEls.length === 0) {
+                inviteeEls = Array.from(document.querySelectorAll('.nexus-meeting-invitee'));
+            }
+
+            if (inviteeEls.length === 0) {
+                showToast('Please select or deploy at least one participant first.', 'error');
                 return;
+            }
+
+            // Resolve name, position, and value/id for each participant
+            const participants = inviteeEls.map(cb => {
+                const label = cb.closest('label');
+                const name = label ? label.querySelector('p.text-sm').innerText.trim() : '';
+                const position = label ? label.querySelector('p.text-\\[10px\\]').innerText.trim() : 'Specialist';
+                return { id: cb.value, name, position };
+            });
+
+            // Detect if specific participants are called out by name or position in the message
+            const lowerText = interventionText.toLowerCase();
+            let finalResponders = [];
+
+            participants.forEach(p => {
+                const nameLower = p.name.toLowerCase();
+                const posLower = p.position.toLowerCase();
+
+                // Direct name check, @mention check, or position keyword check
+                const isNameCalled = lowerText.includes(nameLower) || lowerText.includes('@' + nameLower);
+                const isRoleCalled = (posLower.includes('strategy') && lowerText.includes('strategy')) ||
+                                     (posLower.includes('growth') && lowerText.includes('growth')) ||
+                                     (posLower.includes('systems') && lowerText.includes('system')) ||
+                                     (posLower.includes('marketing') && lowerText.includes('marketing')) ||
+                                     (posLower.includes('engineer') && lowerText.includes('engineer')) ||
+                                     (posLower.includes('developer') && lowerText.includes('developer'));
+
+                if (isNameCalled || isRoleCalled) {
+                    finalResponders.push(p);
+                }
+            });
+
+            // If no specific participant is called out, then all active participants answer!
+            if (finalResponders.length === 0) {
+                finalResponders = participants;
             }
 
             // Halt the ongoing default meeting round-robin loop
             meetingPaused = true;
 
+            // Render chairman's instruction bubble
             const bubble = `<div class="flex gap-4 items-start justify-end animate-fade-in-up">
                 <div class="max-w-[80%] p-6 rounded-3xl bg-accent text-[#1e293b] shadow-xl">
                     <p class="text-[10px] font-bold uppercase mb-2">Chairman Instruction</p>
@@ -716,20 +758,21 @@ function initNexusAdminBridge() {
             document.getElementById('nexus-meeting-transcript').innerHTML += bubble;
             input.value = '';
 
-            showToast('Strategic intervention dispatched to all participants.', 'info');
+            const responderNames = finalResponders.map(r => r.name).join(', ');
+            showToast('Strategic intervention dispatched to: ' + responderNames, 'info');
 
-            // Trigger each participant to answer the chairman in sequence
-            runChairmanIntervention(invitees, interventionText, 0);
+            // Trigger responding participants to answer the chairman in sequence
+            runChairmanIntervention(finalResponders, interventionText, 0);
         });
     }
 
-    function runChairmanIntervention(invitees, interventionText, index = 0) {
-        if (index >= invitees.length) {
-            document.getElementById('nexus-meeting-transcript').innerHTML += '<p class="text-green-500 font-bold text-center mt-10 uppercase tracking-widest">All participants have responded to the Chairman.</p>';
+    function runChairmanIntervention(responders, interventionText, index = 0) {
+        if (index >= responders.length) {
+            document.getElementById('nexus-meeting-transcript').innerHTML += '<p class="text-green-500 font-bold text-center mt-10 uppercase tracking-widest">All called-out participants have responded to the Chairman.</p>';
             return;
         }
 
-        const nextId = invitees[index];
+        const responder = responders[index];
         const transcript = document.getElementById('nexus-meeting-transcript');
         const thinkingId = 'nexus-thinking-' + Date.now();
         const thinkingHtml = `
@@ -744,7 +787,7 @@ function initNexusAdminBridge() {
         transcript.scrollTop = transcript.scrollHeight;
 
         const meetingPayload = {
-            agent_id: nextId,
+            agent_id: responder.id,
             agenda: "CHAIRMAN INTERVENTION: " + interventionText,
             round: index + 1
         };
@@ -757,8 +800,8 @@ function initNexusAdminBridge() {
 
             const colors = ['#7C3AED', '#0ea5e9', '#f59e0b', '#10b981', '#ef4444', '#f97316'];
             const agentColor = colors[index % colors.length];
-            const agentName = res ? (res.agent_name || 'AI Agent') : 'AI Agent';
-            const positionName = res ? (res.position || 'Specialist') : 'Specialist';
+            const agentName = res ? (res.agent_name || responder.name) : responder.name;
+            const positionName = res ? (res.position || responder.position) : responder.position;
 
             const bubble = `<div class="flex gap-6 items-start animate-fade-in-up">
                 <div class="w-12 h-12 rounded-full shrink-0 flex items-center justify-center font-bold text-[#1e293b] shadow-xl" style="background-color: ${agentColor}">${escapeHTML(agentName[0])}</div>
@@ -770,7 +813,7 @@ function initNexusAdminBridge() {
             transcript.innerHTML += bubble;
             transcript.scrollTop = transcript.scrollHeight;
 
-            setTimeout(() => runChairmanIntervention(invitees, interventionText, index + 1), 2000);
+            setTimeout(() => runChairmanIntervention(responders, interventionText, index + 1), 2000);
         });
     }
 
