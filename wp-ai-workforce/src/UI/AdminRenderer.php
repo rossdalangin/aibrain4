@@ -1352,7 +1352,7 @@ class AdminRenderer {
 							</div>
 						</div>
 
-						<div id="nexus-meeting-transcript" class="flex-1 p-10 space-y-8 overflow-y-auto max-h-[500px] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+						<div id="nexus-meeting-transcript" class="flex-1 p-10 space-y-8 overflow-y-auto max-h-[500px]">
 							<div class="flex flex-col items-center justify-center h-full text-center text-gray-500">
 								<p>Awaiting Session Initialization.</p>
 							</div>
@@ -1875,7 +1875,7 @@ class AdminRenderer {
 							<span class="text-[9px] text-nexus-violet font-bold bg-nexus-violet/10 border border-nexus-violet/20 px-2 py-1 rounded-full uppercase">Agent Isolated Context</span>
 						</div>
 
-						<div id="nexus-playground-chat" class="flex-1 p-8 space-y-6 overflow-y-auto max-h-[450px] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+						<div id="nexus-playground-chat" class="flex-1 p-8 space-y-6 overflow-y-auto max-h-[450px]">
 							<div class="text-center text-gray-500 py-20">
 								Select an agent above to begin conversation.
 							</div>
