@@ -41,6 +41,27 @@ class EmployeeController {
 	public function create_item( WP_REST_Request $request ): WP_REST_Response {
 		$params = $request->get_params();
 
+		// Secure plan agent limit validation
+		$active_plan = BillingController::get_verified_plan();
+		$count = count( $this->repository->get_all() );
+
+		$limits = [
+			'starter'    => 1,
+			'free'       => 1,
+			'pro'        => 10,
+			'agency'     => 100,
+			'enterprise' => 999999,
+		];
+
+		$limit = $limits[ strtolower( $active_plan ) ] ?? 1;
+
+		if ( $count >= $limit ) {
+			return new WP_REST_Response( [
+				'error'   => true,
+				'message' => 'Plan limit reached. You can only deploy up to ' . $limit . ' AI agent(s) on the ' . strtoupper($active_plan) . ' plan. Please upgrade your subscription.'
+			], 403 );
+		}
+
 		// Sanitize and prepare data
 		$data = [
 			'name'             => sanitize_text_field( $params['name'] ?? '' ),

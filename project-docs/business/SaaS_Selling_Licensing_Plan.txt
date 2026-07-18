@@ -1,0 +1,82 @@
+================================================================================
+NEXUS AI WORKFORCE - SAAS MONETIZATION, LICENSING & PAYMENTS ARCHITECTURE PLAN
+================================================================================
+
+This document outlines the strategic roadmap and technical implementation for
+selling the Nexus AI Workforce plugin, implementing cryptographic licensing,
+accepting subscription payments, and securing the platform against piracy or bypass.
+
+--------------------------------------------------------------------------------
+1. RECOMMENDATION: THE BEST SELLING & MONETIZATION APPROACH
+--------------------------------------------------------------------------------
+For a high-tier enterprise WordPress plugin like Nexus AI Workforce, a hybrid
+Freemium / SaaS Bridge model is the most effective approach.
+
+A. Sales Platforms:
+   - Option A: Stripe Billing + Custom Licensing Server (Recommended for SaaS)
+     Provides direct control over the billing portal, recurring subscriptions,
+     and license validation API. Low fee (only Stripe's ~2.9% + 30c).
+   - Option B: Freemius
+     An out-of-the-box monetization platform for WordPress. Handles checkout,
+     VAT, license generation, and software updates out of the box, but charges
+     7% to 15% revenue share.
+   - Option C: WooCommerce + Software Add-on
+     Excellent if you want to sell from your own WordPress site, utilizing Stripe
+     for WooCommerce subscriptions.
+
+B. Selected Strategy: Stripe Billing + Cryptographic Licensing Server
+   We will build a custom, secure licensing check directly into the plugin and
+   provide the companion Licensing Plugin that simulates the license validation, Stripe
+   payment collection integration, and key registration server.
+
+--------------------------------------------------------------------------------
+2. TECHNICAL ARCHITECTURE OF THE SECURED LICENSING SYSTEM
+--------------------------------------------------------------------------------
+To protect premium features and prevent users from simply modifying options in
+the WordPress database, we employ a Cryptographically-Signed License check:
+
+1. Purchase:
+   The user purchases a subscription (Starter, Pro, Agency, Enterprise) on the
+   master site via Stripe Checkout.
+2. License Generation:
+   The licensing server generates a cryptographically random license key and maps
+   it to the user's Stripe Subscription ID, Plan level, and Expiration date.
+3. Verification:
+   The user enters the License Key in their WordPress Admin dashboard.
+4. Activation Call:
+   The user's site makes a remote POST request to the licensing server:
+   `POST https://nexus-ai-saas.com/wp-json/nexus-licensing/v1/activate`
+5. Signature Verification:
+   The licensing server verifies the key and responds with a JSON payload containing:
+   - license_key
+   - plan (pro, agency, enterprise)
+   - status (active, expired)
+   - expires_at
+   - signature (SHA-256 HMAC of the payload signed with a master secret key).
+6. Local Validation:
+   The local plugin verifies the HMAC signature using its public/shared secret.
+   If the signature matches, it unlocks the plan and restricts agent/features
+   to the allowed limits. This prevents local database spoofing or database-level tampering!
+
+--------------------------------------------------------------------------------
+3. SECURITY HARDENING OF THE WORKFORCE CORE PLUGIN
+--------------------------------------------------------------------------------
+To ensure absolute platform security and compliance with WordPress security standards, we:
+- Enforce strict capability checks (`manage_options`) on all REST API endpoints.
+- Sanitize and escape all input parameters (using `sanitize_text_field`, `esc_html`, etc.).
+- Prevent Direct File Access (using `defined( 'ABSPATH' ) || exit;`).
+- Encrypt sensitive data like API keys in the database using strong encryption (AES-256-CTR) with salt keys.
+- Enforce strict CSRF protection using WP Nonces (`X-WP-Nonce`) on all AJAX / REST requests.
+
+--------------------------------------------------------------------------------
+4. IMPLEMENTATION ROADMAP
+--------------------------------------------------------------------------------
+To make this work immediately, we will:
+1. Extend the main plugin (`wp-ai-workforce`) with secure license validation:
+   - Add a license verification method in `BillingController` that verifies license signatures.
+   - Create local boundaries that check the license status before allowing premium models or extra AI employees.
+2. Create a companion add-on plugin `wp-ai-licensing` that acts as the Licensing, Payment, and Activation manager:
+   - Implements payment checkout stubs and licensing validation API routes.
+   - Signs the validation payload using a secure HMAC SHA-256 key to simulate a real, secure master license server.
+3. Secure and harden endpoints across both plugins.
+================================================================================

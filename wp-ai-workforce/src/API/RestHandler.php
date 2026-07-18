@@ -48,6 +48,14 @@ class RestHandler {
 			],
 		] );
 
+		register_rest_route( $this->namespace, '/billing/activate-license', [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $billing_controller, 'activate_license' ],
+				'permission_callback' => [ $this, 'check_permission' ],
+			],
+		] );
+
 		register_rest_route( $this->namespace, '/billing/upgrade', [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,

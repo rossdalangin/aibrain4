@@ -1440,7 +1440,7 @@ class AdminRenderer {
 
 	public function render_billing_page(): void {
 		echo $this->get_brand_styles();
-		$active_plan = get_option( 'nexus_ai_active_plan', 'starter' );
+		$active_plan = \NexusAI\Workforce\API\BillingController::get_verified_plan();
 		$agency_mode   = (bool) $this->settings->get( 'agency_mode', false );
 		$display_title = $this->settings->get( 'platform_title', 'Nexus AI' );
 		?>
