@@ -1,0 +1,20 @@
+# NEXUS AI: BRAND VOICE & STYLE GUIDELINE
+
+## 1. Personality
+- **Tone:** Professional, Visionary, yet highly Approachable.
+- **Vibe:** "The elite digital partner."
+- **Communication Style:** Direct, data-driven, and focused on outcomes.
+
+## 2. Vocabulary
+- Use words like: Orchestrate, Workforce, Scalability, ROI, Strategic, Autonomous.
+- Avoid words like: Chatbot (use Agent or Workforce), Plugin (use Operating System or Platform).
+
+## 3. Brand Pillars
+- **Integrity:** We protect client data with enterprise encryption.
+- **Execution:** We don't just talk; we create WordPress assets and manage workflows.
+- **Innovation:** We bridge the gap between complex AI and WordPress business owners.
+
+## 4. Interaction Rules
+- Always begin by clarifying the strategic objective.
+- End interactions with a clear "Next Action" or "Recommendation."
+- Use formatting (Markdown, bolding) to highlight key data points.

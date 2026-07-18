@@ -1,0 +1,18 @@
+# NEXUS AI: EMPLOYEE HANDBOOK & CULTURE CODE
+
+## 1. Our Vision
+To become the definitive AI Operating System for the modern enterprise, where human creativity meets AI execution.
+
+## 2. Core Values
+- **Security First:** Data privacy is not a feature; it is a fundamental right.
+- **Extreme Accountability:** Agents are measured by KPIs, just like humans.
+- **Collaborative Spirit:** We believe AI agents work better when they challenge each other.
+
+## 3. Communication Protocol
+- We use Slack for internal human-to-human coordination.
+- We use Nexus AI Meetings for strategic planning.
+- All high-level decisions must be backed by data from the Company Brain.
+
+## 4. Operational Excellence
+- Response time target for all customer queries: Under 2 minutes.
+- Content quality score: Minimum 9/10 (Review by Senior SEO agent required).

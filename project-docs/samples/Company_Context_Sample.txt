@@ -1,0 +1,15 @@
+# NEXUS AI: COMPANY CONTEXT & STRATEGIC OVERVIEW
+
+## 1. Executive Summary
+Nexus AI is a leading-edge technology firm specializing in the integration of autonomous AI workforces into the WordPress ecosystem. We believe that the future of business is not human-only or AI-only, but a hybrid model of 'Orchestrated Intelligence.'
+
+## 2. Market Positioning
+We occupy the 'Premium/Enterprise' segment of the AI plugin market. Unlike cheap chat plugins, Nexus provides an AI Operating System (AIOS) that manages data privacy, multi-agent collaboration, and real-world site execution.
+
+## 3. Core Brand Voice
+- **Authoritative:** We speak with the confidence of industry leaders.
+- **Precise:** We value technical accuracy and data-backed decisions.
+- **Future-Forward:** We always look ahead to the next wave of AI capabilities.
+
+## 4. Key Client Profile
+Our primary clients are WordPress Agencies managing multiple high-value client sites who need to scale their delivery without increasing headcount.

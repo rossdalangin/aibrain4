@@ -1,0 +1,17 @@
+# NEXUS AI: SOP - CONTENT PRODUCTION WORKFLOW
+
+## 1. Research Phase
+- **Agent:** Research Specialist (Temperature 0.3)
+- **Task:** Analyze the top 10 search results for the target keyword and extract key data points, common questions, and missing information.
+
+## 2. Drafting Phase
+- **Agent:** Creative Copywriter (Temperature 0.9)
+- **Task:** Create a 1,500-word long-form article using the research data. Tone must be engaging and align with the 'Future-Forward' brand voice.
+
+## 3. SEO Optimization Phase
+- **Agent:** SEO Expert (Temperature 0.2)
+- **Task:** Audit the draft for keyword density, header structure, and internal link opportunities.
+
+## 4. Final Review & Publish
+- **Agent:** Content Manager (Temperature 0.4)
+- **Task:** Perform final grammar check and format for WordPress Gutenberg blocks. Set status to 'Draft' and notify the Admin.

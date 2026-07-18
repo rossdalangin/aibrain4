@@ -1,0 +1,16 @@
+# NEXUS AI: PRODUCT CATALOG & SERVICES
+
+## PRODUCT 01: Nexus Pro Plan
+- **Price:** $197/month
+- **Features:** 10 AI Agents, 5GB Company Brain, Multi-Model Access.
+- **Value:** Ideal for small teams scaling their content and support operations.
+
+## PRODUCT 02: Nexus Agency Plan
+- **Price:** $497/month
+- **Features:** Unlimited Agents, White-Labeling, Client Portals, Marketplace access.
+- **Value:** Designed for marketing agencies building "AIaaS" recurring revenue.
+
+## SERVICE 01: White-Glove Onboarding
+- **Price:** $2,500 (one-time)
+- **Included:** Knowledge base setup, Custom Agent hiring, 4-hour training session.
+- **Value:** Recommended for Enterprise clients with complex document hierarchies.

@@ -1,0 +1,126 @@
+/* Nexus AI Workforce - Professional Flat Frontend Widget */
+
+:root {
+  --nexus-widget-accent: #4f46e5;
+  --nexus-widget-bg: #ffffff;
+  --nexus-widget-surface: #f8fafc;
+  --nexus-widget-text: #1e293b;
+  --nexus-widget-border: #e2e8f0;
+}
+
+#nexus-chat-widget-container {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 999999;
+  font-family: 'Inter', sans-serif;
+}
+
+#nexus-chat-trigger {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px; /* Flat Boxy style */
+  background: var(--nexus-widget-accent);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+#nexus-chat-window {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  width: 360px;
+  height: 500px;
+  background: var(--nexus-widget-bg);
+  border: 1px solid var(--nexus-widget-border);
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#nexus-chat-window.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nexus-chat-header {
+  padding: 1rem;
+  background: var(--nexus-widget-accent);
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nexus-chat-agent-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+#nexus-chat-messages {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.nexus-msg {
+  max-width: 80%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.nexus-msg-user {
+  align-self: flex-end;
+  background: var(--nexus-widget-accent);
+  color: #1e293b;
+}
+
+.nexus-msg-ai {
+  align-self: flex-start;
+  background: var(--nexus-widget-surface);
+  border: 1px solid var(--nexus-widget-border);
+  color: var(--nexus-widget-text);
+}
+
+.nexus-chat-input-container {
+  padding: 1rem;
+  border-top: 1px solid var(--nexus-widget-border);
+  background: #f8fafc;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nexus-chat-input-container input {
+  flex: 1;
+  border: 1px solid var(--nexus-widget-border);
+  border-radius: 6px;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.nexus-chat-send-btn {
+  background: var(--nexus-widget-accent);
+  color: #1e293b;
+  border: none;
+  border-radius: 6px;
+  padding: 0 1rem;
+  cursor: pointer;
+}

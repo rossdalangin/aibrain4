@@ -1,0 +1,163 @@
+/* Nexus AI Workforce - Professional Flat UI Styles */
+
+:root {
+  --nexus-violet: #4f46e5; /* Standard Indigo */
+  --nexus-blue: #0284c7;   /* Standard Sky Blue */
+  --nexus-gold: #d97706;   /* Standard Amber */
+  --nexus-green: #059669;  /* Standard Emerald */
+  --nexus-red: #dc2626;    /* Standard Red */
+  --nexus-orange: #ea580c; /* Standard Orange */
+  --nexus-slate: #475569;
+
+  --nexus-bg: #f8fafc;     /* Light Gray BG */
+  --nexus-surface: #f8fafc; /* White Surface */
+  --nexus-elevated: #f1f5f9;
+  --nexus-border: #e2e8f0;
+  --nexus-text-main: #1e293b;
+  --nexus-text-muted: #64748b;
+}
+
+.nexus-admin-body {
+  background-color: var(--nexus-bg);
+  color: var(--nexus-text-main);
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Removal of Mesh Blobs & Overlays for Flat Style */
+.nexus-admin-body::before, .nexus-admin-body::after, .nexus-tactile-overlay {
+  display: none !important;
+}
+
+/* Flat Professional Panels */
+.glass-panel {
+  background: var(--nexus-surface);
+  border: 1px solid var(--nexus-border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-panel:hover {
+  background: var(--nexus-surface);
+  border-color: var(--nexus-accent);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.glass-card-hover:hover {
+  transform: translateY(-2px);
+  border-color: var(--nexus-accent);
+}
+
+/* Typography Overrides for Light Theme */
+.text-[#1e293b] { color: var(--nexus-text-main) !important; }
+.text-[#64748b] { color: var(--nexus-text-muted) !important; }
+.text-[#1e293b] { color: var(--nexus-slate) !important; }
+.text-[#1e293b] { color: var(--nexus-text-main) !important; }
+.text-gray-400 { color: var(--nexus-text-muted) !important; }
+.text-gray-500 { color: var(--nexus-text-muted) !important; }
+.text-gray-200 { color: var(--nexus-text-main) !important; }
+.text-gray-300 { color: var(--nexus-text-main) !important; }
+
+/* Dashboard Titles */
+.text-gradient-vibrant {
+  background: none !important;
+  -webkit-text-fill-color: var(--nexus-text-main) !important;
+  color: var(--nexus-text-main) !important;
+  filter: none !important;
+  animation: none !important;
+  font-weight: 800;
+}
+
+/* Standard Buttons - Flat Style */
+.nexus-btn-vibrant {
+  background: var(--nexus-accent) !important;
+  color: #f8fafc !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 10px 20px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+}
+
+.nexus-btn-vibrant:hover {
+  filter: brightness(1.1);
+  transform: none !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+/* Page Themes - Professional Palette */
+.theme-overview { --nexus-accent: #6366f1; --nexus-accent-secondary: #4f46e5; }
+.theme-workforce { --nexus-accent: #10b981; --nexus-accent-secondary: #059669; }
+.theme-kb { --nexus-accent: #0ea5e9; --nexus-accent-secondary: #0284c7; }
+.theme-automations { --nexus-accent: #f97316; --nexus-accent-secondary: #ea580c; }
+.theme-settings { --nexus-accent: #64748b; --nexus-accent-secondary: #475569; }
+.theme-meetings { --nexus-accent: #8b5cf6; --nexus-accent-secondary: #7c3aed; }
+.theme-learning { --nexus-accent: #f59e0b; --nexus-accent-secondary: #d97706; }
+
+/* Flat Form Controls */
+input[type="text"],
+input[type="password"],
+input[type="url"],
+input[type="email"],
+input[type="number"],
+textarea,
+select {
+  background-color: #f1f5f9 !important;
+  border: 1px solid var(--nexus-border) !important;
+  color: var(--nexus-text-main) !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--nexus-accent) !important;
+  outline: 2px solid var(--nexus-accent) !important;
+  outline-offset: -1px !important;
+  background-color: #f1f5f9 !important;
+  transform: none !important;
+}
+
+.form-group-tint {
+  background: #f1f5f9;
+  border: 1px solid var(--nexus-border);
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+/* Step Guides & Tips */
+.nexus-step-guide {
+  background: #f1f5f9;
+  border: 1px solid var(--nexus-border);
+  border-radius: 8px;
+}
+
+.nexus-pro-tip {
+  border-left: 4px solid var(--nexus-gold);
+  background: #fffbeb;
+  color: #92400e;
+}
+
+/* Remove Border Beam & Neural Pulse animations for Flat Style */
+.nexus-border-beam, .nexus-neural-pulse {
+  display: none !important;
+}
+
+/* Strategic Archive & Tables */
+tr:hover td {
+  background: #f1f5f9;
+}
+
+.bg-nexus-elevated { background-color: #f1f5f9 !important; }
+.bg-nexus-bg { background-color: #f1f5f9 !important; }
+.border-nexus-border { border-color: #e2e8f0 !important; }
+
+/* Custom theme accent utility classes */
+.bg-accent { background-color: var(--nexus-accent) !important; }
+.text-accent { color: var(--nexus-accent) !important; }
+.border-accent { border-color: var(--nexus-accent) !important; }

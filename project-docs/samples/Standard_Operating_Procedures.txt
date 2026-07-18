@@ -1,0 +1,17 @@
+# NEXUS AI: STANDARD OPERATING PROCEDURES (SOP)
+
+## SOP-001: Hiring a New AI Agent
+1. **Define Objective:** Determine if the role is Creative (0.8 Temp) or Logical (0.2 Temp).
+2. **Key Skills:** Input exactly 3-5 specific technical skills.
+3. **KPI Assignment:** Every agent must have a measurable success metric (e.g., Conversion Rate).
+4. **Validation:** Run a 5-message test conversation to verify tone alignment.
+
+## SOP-002: Knowledge Ingestion
+1. **Sanitize Data:** Ensure PDFs do not contain raw passwords or internal API keys.
+2. **Categorize:** Assign the document to a Department (Marketing, Sales, IT).
+3. **Index:** Run the URL Scraper for the most recent documentation.
+
+## SOP-003: Multi-Agent Collaboration
+1. **Moderation:** Always include a 'CEO' or 'Manager' agent in meetings.
+2. **Conflict Resolution:** If agents disagree, use the "Consensus Mode" feature.
+3. **Reporting:** Export minutes to the #admin-reports channel.
