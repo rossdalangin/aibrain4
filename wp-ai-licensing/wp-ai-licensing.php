@@ -24,12 +24,23 @@ class Nexus_AI_Licensing {
 	public static function init() {
 		$instance = new self();
 		add_action( 'rest_api_init', [ $instance, 'register_routes' ] );
-		add_action( 'admin_menu', [ $instance, 'add_licensing_menu' ] );
+		add_action( 'admin_menu', [ $instance, 'add_licensing_menu' ], 99 ); // Priority 99 to load after parent menu
 		add_action( 'admin_init', [ $instance, 'initialize_settings_and_samples' ] );
+		add_action( 'admin_init', [ $instance, 'handle_malformed_menu_links' ] );
 
 		// Register interactive Shortcodes
 		add_shortcode( 'nexus_pricing_table', [ $instance, 'pricing_table_shortcode' ] );
 		add_shortcode( 'nexus_thank_you', [ $instance, 'thank_you_shortcode' ] );
+	}
+
+	/**
+	 * Fallback redirect to handle any malformed direct admin links.
+	 */
+	public function handle_malformed_menu_links() {
+		if ( is_admin() && strpos( $_SERVER['REQUEST_URI'], '/wp-admin/nexus-ai-licensing' ) !== false ) {
+			wp_safe_redirect( admin_url( 'admin.php?page=nexus-ai-licensing' ) );
+			exit;
+		}
 	}
 
 	/**
