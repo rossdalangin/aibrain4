@@ -249,7 +249,7 @@ class AdminRenderer {
 						</div>
 						<button id="nexus-close-archive" class="text-gray-400 hover:text-[#1e293b] bg-[#f8fafc]/5 px-4 py-2 rounded-xl">Close Archive</button>
 					</div>
-					<div id="nexus-archive-content" class="flex-1 p-10 overflow-y-auto space-y-6 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+					<div id="nexus-archive-content" class="flex-1 p-10 overflow-y-auto space-y-6">
 						<!-- Messages will appear here -->
 					</div>
 				</div>
@@ -1434,6 +1434,23 @@ class AdminRenderer {
 					</table>
 				</div>
 			</div>
+
+			<!-- Archive Viewer Modal -->
+			<div id="nexus-archive-modal" class="fixed inset-0 z-[10000] hidden">
+				<div class="absolute inset-0 bg-black/90 backdrop-blur-md"></div>
+				<div class="absolute inset-x-20 top-20 bottom-20 glass-panel rounded-3xl border border-nexus-border flex flex-col overflow-hidden shadow-2xl">
+					<div class="p-8 border-b border-nexus-border flex justify-between items-center bg-nexus-elevated/50">
+						<div>
+							<h2 id="nexus-archive-title" class="text-2xl font-bold text-[#1e293b] uppercase tracking-tighter">Session Transcript</h2>
+							<p id="nexus-archive-meta" class="text-xs text-gray-500 mt-1">Archived intelligence record</p>
+						</div>
+						<button id="nexus-close-archive" class="text-gray-400 hover:text-[#1e293b] bg-[#f8fafc]/5 px-4 py-2 rounded-xl">Close Archive</button>
+					</div>
+					<div id="nexus-archive-content" class="flex-1 p-10 overflow-y-auto space-y-6">
+						<!-- Messages will appear here -->
+					</div>
+				</div>
+			</div>
 		</div>
 		<?php
 	}
@@ -1443,6 +1460,12 @@ class AdminRenderer {
 		$active_plan = \NexusAI\Workforce\API\BillingController::get_verified_plan();
 		$agency_mode   = (bool) $this->settings->get( 'agency_mode', false );
 		$display_title = $this->settings->get( 'platform_title', 'Nexus AI' );
+
+		// Load dynamic pricing and base configurations from settings
+		$pro_price    = get_option( 'nexus_plan_pro_price', '497.00' );
+		$agency_price = get_option( 'nexus_plan_agency_price', '997.00' );
+		$currency     = get_option( 'nexus_payment_currency', 'USD' );
+		$symbol       = $currency === 'EUR' ? '€' : ($currency === 'GBP' ? '£' : '$');
 		?>
 		<div class="nexus-admin-body p-10 theme-overview animate-fade-in-up">
 			<div class="mb-10 flex justify-between items-end">
@@ -1489,40 +1512,40 @@ class AdminRenderer {
 				<!-- Starter -->
 				<div class="glass-panel p-8 rounded-3xl border border-nexus-border flex flex-col h-full">
 					<h3 class="text-xl font-bold text-[#1e293b] mb-2">Starter</h3>
-					<p class="text-3xl font-black text-[#1e293b] mb-6">$197<span class="text-sm text-gray-500 font-normal">/mo</span></p>
+					<p class="text-3xl font-black text-[#1e293b] mb-6"><?php echo esc_html($symbol); ?>0<span class="text-sm text-gray-500 font-normal">/mo</span></p>
 					<ul class="space-y-4 text-sm text-gray-400 mb-10 flex-1">
-						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> 3 AI Agents</li>
+						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> 1 AI Agent</li>
 						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Basic Company Brain</li>
 						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Standard Support</li>
 					</ul>
-					<button class="w-full bg-[#f8fafc]/5 border border-white/10 text-[#1e293b] font-bold py-3 rounded-xl hover:bg-[#f8fafc]/10 transition-all">Current Plan</button>
+					<button class="w-full bg-[#f8fafc]/5 border border-white/10 text-[#1e293b] font-bold py-3 rounded-xl hover:bg-[#f8fafc]/10 transition-all"><?php echo $active_plan === 'starter' ? 'Current Plan' : 'Default Plan'; ?></button>
 				</div>
 
 				<!-- Pro -->
 				<div class="glass-panel p-8 rounded-3xl border-2 border-accent flex flex-col h-full relative overflow-hidden">
 					<div class="absolute top-0 right-0 bg-accent text-[#1e293b] text-[10px] font-bold px-4 py-1 rounded-bl-xl uppercase">Most Popular</div>
 					<h3 class="text-xl font-bold text-[#1e293b] mb-2">Professional</h3>
-					<p class="text-3xl font-black text-[#1e293b] mb-6">$497<span class="text-sm text-gray-500 font-normal">/mo</span></p>
+					<p class="text-3xl font-black text-[#1e293b] mb-6"><?php echo esc_html($symbol . $pro_price); ?><span class="text-sm text-gray-500 font-normal">/mo</span></p>
 					<ul class="space-y-4 text-sm text-gray-400 mb-10 flex-1">
-						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> 15 AI Agents</li>
+						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> 10 AI Agents</li>
 						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Advanced RAG Engine</li>
 						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Multi-Agent Workflows</li>
 						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Priority API Access</li>
 					</ul>
-					<button data-plan="pro" class="nexus-upgrade-plan-btn w-full bg-accent text-[#1e293b] font-bold py-3 rounded-xl hover:opacity-90 transition-all nexus-btn-vibrant">Upgrade to Pro</button>
+					<button data-plan="pro" class="nexus-upgrade-plan-btn w-full bg-accent text-[#1e293b] font-bold py-3 rounded-xl hover:opacity-90 transition-all nexus-btn-vibrant"><?php echo $active_plan === 'pro' ? 'Current Plan' : 'Upgrade to Pro'; ?></button>
 				</div>
 
 				<!-- Agency -->
 				<div class="glass-panel p-8 rounded-3xl border border-nexus-border flex flex-col h-full">
 					<h3 class="text-xl font-bold text-[#1e293b] mb-2">Agency</h3>
-					<p class="text-3xl font-black text-[#1e293b] mb-6">$997<span class="text-sm text-gray-500 font-normal">/mo</span></p>
+					<p class="text-3xl font-black text-[#1e293b] mb-6"><?php echo esc_html($symbol . $agency_price); ?><span class="text-sm text-gray-500 font-normal">/mo</span></p>
 					<ul class="space-y-4 text-sm text-gray-400 mb-10 flex-1">
-						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Unlimited Agents</li>
+						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> 100 AI Agents</li>
 						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> White Labeling</li>
 						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Client Portals</li>
 						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> 24/7 Dedicated Support</li>
 					</ul>
-					<button data-plan="agency" class="nexus-upgrade-plan-btn w-full bg-[#f8fafc]/5 border border-white/10 text-[#1e293b] font-bold py-3 rounded-xl hover:bg-[#f8fafc]/10 transition-all">Select Agency</button>
+					<button data-plan="agency" class="nexus-upgrade-plan-btn w-full bg-[#f8fafc]/5 border border-white/10 text-[#1e293b] font-bold py-3 rounded-xl hover:bg-[#f8fafc]/10 transition-all"><?php echo $active_plan === 'agency' ? 'Current Plan' : 'Select Agency'; ?></button>
 				</div>
 
 				<!-- Enterprise -->
@@ -1534,7 +1557,7 @@ class AdminRenderer {
 						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Custom SLA</li>
 						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> On-Premise Training</li>
 					</ul>
-					<button data-plan="enterprise" class="nexus-upgrade-plan-btn w-full bg-nexus-blue text-[#1e293b] font-bold py-3 rounded-xl hover:opacity-90 transition-all nexus-btn-vibrant">Contact Sales</button>
+					<button data-plan="enterprise" class="nexus-upgrade-plan-btn w-full bg-nexus-blue text-[#1e293b] font-bold py-3 rounded-xl hover:opacity-90 transition-all nexus-btn-vibrant"><?php echo $active_plan === 'enterprise' ? 'Current Plan' : 'Contact Sales'; ?></button>
 				</div>
 			</div>
 
