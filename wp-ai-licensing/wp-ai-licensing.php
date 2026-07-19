@@ -53,7 +53,7 @@ class Nexus_AI_Licensing {
 	 */
 	public function add_licensing_menu() {
 		add_submenu_page(
-			'nexus-ai', // Parent menu (Nexus AI main dashboard)
+			'nexus-ai-workforce', // Parent menu (Nexus AI main dashboard)
 			'Licensing & Payments',
 			'License & Payments',
 			'manage_options',
