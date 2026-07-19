@@ -644,12 +644,99 @@ function initNexusAdminBridge() {
         }
     });
 
-    // --- 7. Billing ---
-    document.querySelectorAll('.nexus-select-plan').forEach(btn => {
+    // --- 7. Billing, Licensing & SaaS Upgrade System ---
+    const licenseForm = document.getElementById('nexus-license-activation-form');
+    if (licenseForm) {
+        licenseForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const keyInput = document.getElementById('nexus-license-key-input');
+            const activateBtn = document.getElementById('nexus-license-activate-btn');
+            const key = keyInput ? keyInput.value.trim() : '';
+
+            if (!key) {
+                showToast('Please enter a license key first.', 'error');
+                return;
+            }
+
+            activateBtn.innerText = 'Verifying...';
+            activateBtn.disabled = true;
+
+            nexusFetch('billing/activate-license', 'POST', { license_key: key }).then(res => {
+                activateBtn.innerText = 'Activate Key';
+                activateBtn.disabled = false;
+
+                if (res && res.success) {
+                    showToast('License successfully validated! Plan updated to ' + res.plan.toUpperCase() + '.', 'success');
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showToast(res && res.message ? res.message : 'Invalid license key activation request.', 'error');
+                }
+            }).catch(err => {
+                activateBtn.innerText = 'Activate Key';
+                activateBtn.disabled = false;
+                showToast('Verification failed. Remote server connection error.', 'error');
+            });
+        });
+    }
+
+    document.querySelectorAll('.nexus-upgrade-plan-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const plan = btn.dataset.plan;
-            btn.innerText = 'Activating...';
-            nexusFetch('billing/upgrade', 'POST', { plan: plan }).then(() => window.location.reload());
+            if (plan === 'enterprise') {
+                showToast('Sales inquiry initiated. Redirecting to contact desk...', 'info');
+                setTimeout(() => {
+                    window.location.href = 'mailto:sales@nexus-ai-saas.com?subject=Enterprise Plan Inquiry';
+                }, 1000);
+                return;
+            }
+
+            btn.innerText = 'Processing...';
+            btn.disabled = true;
+
+            // Generate secure checkout session on our SaaS payment licensing server
+            // (Uses namespace: /wp-json/nexus-licensing/v1/checkout)
+            const localData = window.nexus_ai_data || {};
+            const restUrl = localData.rest_url || '/wp-json/';
+            const nonce = localData.nonce || '';
+
+            fetch(restUrl + 'nexus-licensing/v1/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': nonce
+                },
+                body: JSON.stringify({ plan: plan })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.checkout_url) {
+                    showToast('Stripe Checkout initiated. Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = data.checkout_url;
+                    }, 1000);
+                } else {
+                    // Fallback to direct core upgrade if licensing plugin is not loaded
+                    nexusFetch('billing/upgrade', 'POST', { plan: plan }).then(res => {
+                        if (res && res.success) {
+                            showToast('Upgraded directly to ' + plan.toUpperCase() + ' plan.', 'success');
+                            setTimeout(() => window.location.reload(), 1500);
+                        } else {
+                            showToast('Upgrade failed. Please try again.', 'error');
+                        }
+                    });
+                }
+            })
+            .catch(() => {
+                // Fallback to core direct upgrade
+                nexusFetch('billing/upgrade', 'POST', { plan: plan }).then(res => {
+                    if (res && res.success) {
+                        showToast('Upgraded directly to ' + plan.toUpperCase() + ' plan.', 'success');
+                        setTimeout(() => window.location.reload(), 1500);
+                    } else {
+                        showToast('Upgrade failed. Please try again.', 'error');
+                    }
+                });
+            });
         });
     });
 

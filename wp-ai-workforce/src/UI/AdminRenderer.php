@@ -1475,6 +1475,16 @@ class AdminRenderer {
 				</div>
 			</div>
 
+			<!-- License Key Activation Panel -->
+			<div class="glass-panel p-8 rounded-3xl border border-nexus-border mb-12 bg-nexus-violet/5">
+				<h3 class="text-xs font-bold text-nexus-violet uppercase tracking-widest mb-4">Enterprise Licensing & Payments Activation</h3>
+				<form id="nexus-license-activation-form" class="flex gap-4 items-center max-w-2xl">
+					<input type="password" id="nexus-license-key-input" class="flex-1 bg-nexus-elevated border border-nexus-border rounded-xl p-3 text-sm text-[#1e293b] focus:border-nexus-violet outline-none" value="<?php echo esc_attr( get_option( 'nexus_ai_license_key', '' ) ); ?>" placeholder="Enter License Key (NEXUS-XXXX-XXXX-XXXX)">
+					<button type="submit" id="nexus-license-activate-btn" class="bg-nexus-violet text-white font-bold px-8 py-3 rounded-xl text-xs hover:opacity-90 transition-all uppercase tracking-wider">Activate Key</button>
+				</form>
+				<p class="text-xs text-gray-500 mt-3">Enter your premium subscription license key to unlock your agent count limits, high-reasoning custom models, and enterprise modules.</p>
+			</div>
+
 			<div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-16">
 				<!-- Starter -->
 				<div class="glass-panel p-8 rounded-3xl border border-nexus-border flex flex-col h-full">
@@ -1499,7 +1509,7 @@ class AdminRenderer {
 						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Multi-Agent Workflows</li>
 						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Priority API Access</li>
 					</ul>
-					<button class="w-full bg-accent text-[#1e293b] font-bold py-3 rounded-xl hover:opacity-90 transition-all nexus-btn-vibrant">Upgrade to Pro</button>
+					<button data-plan="pro" class="nexus-upgrade-plan-btn w-full bg-accent text-[#1e293b] font-bold py-3 rounded-xl hover:opacity-90 transition-all nexus-btn-vibrant">Upgrade to Pro</button>
 				</div>
 
 				<!-- Agency -->
@@ -1512,7 +1522,7 @@ class AdminRenderer {
 						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Client Portals</li>
 						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> 24/7 Dedicated Support</li>
 					</ul>
-					<button class="w-full bg-[#f8fafc]/5 border border-white/10 text-[#1e293b] font-bold py-3 rounded-xl hover:bg-[#f8fafc]/10 transition-all">Select Plan</button>
+					<button data-plan="agency" class="nexus-upgrade-plan-btn w-full bg-[#f8fafc]/5 border border-white/10 text-[#1e293b] font-bold py-3 rounded-xl hover:bg-[#f8fafc]/10 transition-all">Select Agency</button>
 				</div>
 
 				<!-- Enterprise -->
@@ -1524,7 +1534,7 @@ class AdminRenderer {
 						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Custom SLA</li>
 						<li class="flex items-center gap-2"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> On-Premise Training</li>
 					</ul>
-					<button class="w-full bg-nexus-blue text-[#1e293b] font-bold py-3 rounded-xl hover:opacity-90 transition-all nexus-btn-vibrant">Contact Sales</button>
+					<button data-plan="enterprise" class="nexus-upgrade-plan-btn w-full bg-nexus-blue text-[#1e293b] font-bold py-3 rounded-xl hover:opacity-90 transition-all nexus-btn-vibrant">Contact Sales</button>
 				</div>
 			</div>
 
