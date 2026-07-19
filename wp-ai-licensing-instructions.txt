@@ -1,0 +1,115 @@
+================================================================================
+NEXUS AI WORKFORCE - ENTERPRISE LICENSING & BILLING INTEGRATION GUIDE
+================================================================================
+
+This step-by-step master guide explains how to set up Pricing Plans, configure
+Payment Gateways (Stripe vs. PayPal), deploy Shortcodes on your sales pages,
+customize the post-checkout Thank You page messages, format Email Notifications,
+and activate License Keys in your Nexus AI Workforce workspace.
+
+--------------------------------------------------------------------------------
+1. SETTING UP PLANS & CHANGING THE PRICING
+--------------------------------------------------------------------------------
+By default, Nexus AI Workforce has three preset premium tiers (Pro, Agency, and
+Enterprise). You can change their prices and metrics directly from the admin:
+
+1. Navigate to your WordPress Admin dashboard.
+2. Go to: Nexus AI > License & Payments (or admin.php?page=nexus-ai-licensing).
+3. Click on the "Pricing & Gateways" tab.
+4. Locate the pricing inputs:
+   - "Pro Plan Monthly Price ($)" (Default is 497.00)
+   - "Agency Plan Monthly Price ($)" (Default is 997.00)
+5. Update the prices to your preferred rates and select your preferred Base Currency
+   (USD, EUR, or GBP) from the dropdown.
+6. Click "Save Gateway & Pricing Configuration" to secure and apply changes.
+
+--------------------------------------------------------------------------------
+2. SETTING UP THE PAYMENT GATEWAYS (STRIPE vs. PAYPAY)
+--------------------------------------------------------------------------------
+You can process secure recurring client subscriptions using either Stripe or PayPal:
+
+1. Navigate to: Nexus AI > License & Payments > Pricing & Gateways tab.
+2. Select your gateway from the "Select Primary Payment Gateway" dropdown:
+   - Select "Stripe Subscription API" or "PayPal Subscriptions".
+3. In the right-hand panel, configure your credentials:
+   - For Stripe: Paste your Stripe Publishable Client ID (`pk_live_...`) and your Secret Key (`sk_live_...`).
+   - For PayPal: Paste your PayPal Business Client ID and Secret Token.
+4. Choose the Billing Mode:
+   - Sandbox / Test Environment: (Recommended during checkout setup to test stubs).
+   - Production / Live Environment: (Use this for live client checkouts).
+5. Click "Save Gateway & Pricing Configuration" to bind the payment handler.
+
+--------------------------------------------------------------------------------
+3. ADDING THE PRICING TABLE TO A SALES PAGE (SHORTCODE)
+--------------------------------------------------------------------------------
+To display a beautiful, responsive, and interactive pricing table grid on your
+sales or marketing landing pages:
+
+1. Create or edit a WordPress page (e.g., your "Pricing" or "Sales" page).
+2. Insert the following pricing shortcode:
+   [nexus_pricing_table]
+3. Save or publish the page. This shortcode will automatically render three professional,
+   premium-styled layout cards (Starter, Pro, and Agency) with your configured prices and
+   plan limits. Clicking "Subscribe" on any plan triggers our simulated SaaS checkout loop.
+
+--------------------------------------------------------------------------------
+4. CONFIGURING THE "THANK YOU" PAGE & PURCHASE COMPLETED MESSAGES
+--------------------------------------------------------------------------------
+Immediately after a customer successfully subscribes and completes their payment,
+they should be redirected to a beautiful "Thank You" page displaying their order
+details and generated License Key:
+
+1. Create a new WordPress page and slug-name it "thank-you" (URL: /thank-you).
+2. Insert the following thank you shortcode:
+   [nexus_thank_you]
+3. Save and publish this page.
+4. To customize the text shown to users:
+   - Navigate to: Nexus AI > License & Payments > Checkout & Email Settings tab.
+   - Edit the "Thank You Message Template" field.
+   - Use these supported dynamic variables to personalize the output:
+     * `{customer_name}`: Resolves to the customer's name.
+     * `{plan_name}`: Resolves to the purchased plan level (e.g., PRO, AGENCY).
+     * `{license_key}`: Resolves to the cryptographically unique license key generated for their subscription.
+   - Click "Save Email & Thank You Templates".
+
+--------------------------------------------------------------------------------
+5. CUSTOMIZING EMAIL NOTIFICATIONS (LICENSE KEY DISPATCH)
+--------------------------------------------------------------------------------
+Every successful subscription automatically dispatches an elegant, high-impact
+email notification to the customer's inbox containing their licensing details:
+
+1. Navigate to: Nexus AI > License & Payments > Checkout & Email Settings tab.
+2. Go to the "Email Notification Template" panel.
+3. Customize the "Email Subject" (e.g., "Your Nexus AI Workforce Premium License Key").
+4. Customize the "Email Body Content". You can structure the email to explain how to
+   use the key and support active links.
+5. Use the supported placeholders: `{customer_name}`, `{plan_name}`, and `{license_key}`.
+6. Click "Save Email & Thank You Templates" to bind the transaction notifier.
+
+--------------------------------------------------------------------------------
+6. HOW THE USER ACTIVATES THE LICENSE KEY
+--------------------------------------------------------------------------------
+Once a customer receives their license key (either on the Thank You screen or via
+their automated email inbox), they can activate it on their site:
+
+1. Copy the license key, e.g., `NEXUS-PRO-ABCD-EFGH`.
+2. Go to their local WordPress Admin dashboard.
+3. Navigate to: Nexus AI > License & Payments.
+4. Click on the "Client Activation" tab.
+5. Paste the key in the "License Key" input field.
+6. Click "Activate Local License".
+7. Our secure activation protocol will make a remote verification call, sign the option,
+   and unlock their workspace limits securely:
+   - Starter Tier: Restricted to 1 active agent.
+   - Pro Tier: Unlocks up to 10 active agents.
+   - Agency Tier: Unlocks up to 100 active agents.
+   - Enterprise Tier: Unlocks unlimited active agents and vector modules.
+
+--------------------------------------------------------------------------------
+7. AUDITING TRANSACTIONS & SIGNATURES
+--------------------------------------------------------------------------------
+As a site administrator, you can audit all transactions, license bindings, and Stripe
+payments:
+- Go to Nexus AI > License & Payments > "License Key Registry" tab to see all generated keys, plan tiers, and their active binding domains.
+- Go to the "Stripe Billing Logs" tab to see Stripe charge IDs, date, customer email, amount paid, and charge status syncs.
+================================================================================

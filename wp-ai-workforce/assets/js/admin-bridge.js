@@ -498,9 +498,7 @@ function initNexusAdminBridge() {
             const log = document.getElementById('nexus-workflow-log');
             log.innerHTML = `<div class="p-6 rounded-2xl bg-accent/10 border border-accent/20 italic text-accent animate-pulse">Initializing execution sequence... Input: "${input}"</div>`;
 
-            console.log("[Workflow Run Trigger]:", { workflowId: id, input: input });
             nexusFetch(`workflows/run/${id}`, 'POST', { input: input }).then(res => {
-                console.log("[Workflow Run Response]:", res);
                 log.innerHTML = '';
                 res.results.forEach((step, idx) => {
                     const outputContent = typeof step.output === 'object' ? step.output.content : step.output;
@@ -646,12 +644,99 @@ function initNexusAdminBridge() {
         }
     });
 
-    // --- 7. Billing ---
-    document.querySelectorAll('.nexus-select-plan').forEach(btn => {
+    // --- 7. Billing, Licensing & SaaS Upgrade System ---
+    const licenseForm = document.getElementById('nexus-license-activation-form');
+    if (licenseForm) {
+        licenseForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const keyInput = document.getElementById('nexus-license-key-input');
+            const activateBtn = document.getElementById('nexus-license-activate-btn');
+            const key = keyInput ? keyInput.value.trim() : '';
+
+            if (!key) {
+                showToast('Please enter a license key first.', 'error');
+                return;
+            }
+
+            activateBtn.innerText = 'Verifying...';
+            activateBtn.disabled = true;
+
+            nexusFetch('billing/activate-license', 'POST', { license_key: key }).then(res => {
+                activateBtn.innerText = 'Activate Key';
+                activateBtn.disabled = false;
+
+                if (res && res.success) {
+                    showToast('License successfully validated! Plan updated to ' + res.plan.toUpperCase() + '.', 'success');
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showToast(res && res.message ? res.message : 'Invalid license key activation request.', 'error');
+                }
+            }).catch(err => {
+                activateBtn.innerText = 'Activate Key';
+                activateBtn.disabled = false;
+                showToast('Verification failed. Remote server connection error.', 'error');
+            });
+        });
+    }
+
+    document.querySelectorAll('.nexus-upgrade-plan-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const plan = btn.dataset.plan;
-            btn.innerText = 'Activating...';
-            nexusFetch('billing/upgrade', 'POST', { plan: plan }).then(() => window.location.reload());
+            if (plan === 'enterprise') {
+                showToast('Sales inquiry initiated. Redirecting to contact desk...', 'info');
+                setTimeout(() => {
+                    window.location.href = 'mailto:sales@nexus-ai-saas.com?subject=Enterprise Plan Inquiry';
+                }, 1000);
+                return;
+            }
+
+            btn.innerText = 'Processing...';
+            btn.disabled = true;
+
+            // Generate secure checkout session on our SaaS payment licensing server
+            // (Uses namespace: /wp-json/nexus-licensing/v1/checkout)
+            const localData = window.nexus_ai_data || {};
+            const restUrl = localData.rest_url || '/wp-json/';
+            const nonce = localData.nonce || '';
+
+            fetch(restUrl + 'nexus-licensing/v1/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': nonce
+                },
+                body: JSON.stringify({ plan: plan })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.checkout_url) {
+                    showToast('Stripe Checkout initiated. Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = data.checkout_url;
+                    }, 1000);
+                } else {
+                    // Fallback to direct core upgrade if licensing plugin is not loaded
+                    nexusFetch('billing/upgrade', 'POST', { plan: plan }).then(res => {
+                        if (res && res.success) {
+                            showToast('Upgraded directly to ' + plan.toUpperCase() + ' plan.', 'success');
+                            setTimeout(() => window.location.reload(), 1500);
+                        } else {
+                            showToast('Upgrade failed. Please try again.', 'error');
+                        }
+                    });
+                }
+            })
+            .catch(() => {
+                // Fallback to core direct upgrade
+                nexusFetch('billing/upgrade', 'POST', { plan: plan }).then(res => {
+                    if (res && res.success) {
+                        showToast('Upgraded directly to ' + plan.toUpperCase() + ' plan.', 'success');
+                        setTimeout(() => window.location.reload(), 1500);
+                    } else {
+                        showToast('Upgrade failed. Please try again.', 'error');
+                    }
+                });
+            });
         });
     });
 
@@ -695,21 +780,132 @@ function initNexusAdminBridge() {
     if (sendMeetingMsgBtn) {
         sendMeetingMsgBtn.addEventListener('click', function() {
             const input = document.getElementById('nexus-meeting-input');
-            if (!input.value) return;
-            chairmanMessage = input.value;
+            if (!input.value.trim()) return;
+            const interventionText = input.value.trim();
+
+            // Find all checked invitees first
+            let inviteeEls = Array.from(document.querySelectorAll('.nexus-meeting-invitee:checked'));
+            // Fallback: If no checkbox is checked, select all available checkboxes (all active participants)
+            if (inviteeEls.length === 0) {
+                inviteeEls = Array.from(document.querySelectorAll('.nexus-meeting-invitee'));
+            }
+
+            if (inviteeEls.length === 0) {
+                showToast('Please select or deploy at least one participant first.', 'error');
+                return;
+            }
+
+            // Resolve name, position, and value/id for each participant
+            const participants = inviteeEls.map(cb => {
+                const label = cb.closest('label');
+                const name = label ? label.querySelector('p.text-sm').innerText.trim() : '';
+                const position = label ? label.querySelector('p.text-\\[10px\\]').innerText.trim() : 'Specialist';
+                return { id: cb.value, name, position };
+            });
+
+            // Detect if specific participants are called out by name or position in the message
+            const lowerText = interventionText.toLowerCase();
+            let finalResponders = [];
+
+            participants.forEach(p => {
+                const nameLower = p.name.toLowerCase();
+                const posLower = p.position.toLowerCase();
+
+                // Direct name check, @mention check, or position keyword check
+                const isNameCalled = lowerText.includes(nameLower) || lowerText.includes('@' + nameLower);
+                const isRoleCalled = (posLower.includes('strategy') && lowerText.includes('strategy')) ||
+                                     (posLower.includes('growth') && lowerText.includes('growth')) ||
+                                     (posLower.includes('systems') && lowerText.includes('system')) ||
+                                     (posLower.includes('marketing') && lowerText.includes('marketing')) ||
+                                     (posLower.includes('engineer') && lowerText.includes('engineer')) ||
+                                     (posLower.includes('developer') && lowerText.includes('developer'));
+
+                if (isNameCalled || isRoleCalled) {
+                    finalResponders.push(p);
+                }
+            });
+
+            // If no specific participant is called out, then all active participants answer!
+            if (finalResponders.length === 0) {
+                finalResponders = participants;
+            }
+
+            // Halt the ongoing default meeting round-robin loop
+            meetingPaused = true;
+
+            // Render chairman's instruction bubble
             const bubble = `<div class="flex gap-4 items-start justify-end animate-fade-in-up">
                 <div class="max-w-[80%] p-6 rounded-3xl bg-accent text-[#1e293b] shadow-xl">
                     <p class="text-[10px] font-bold uppercase mb-2">Chairman Instruction</p>
-                    <p class="text-sm leading-relaxed">${escapeHTML(input.value)}</p>
+                    <p class="text-sm leading-relaxed">${escapeHTML(interventionText)}</p>
                 </div>
             </div>`;
             document.getElementById('nexus-meeting-transcript').innerHTML += bubble;
             input.value = '';
-            showToast('Intervention recorded. AI agents will adjust in the next round.');
+
+            const responderNames = finalResponders.map(r => r.name).join(', ');
+            showToast('Strategic intervention dispatched to: ' + responderNames, 'info');
+
+            // Trigger responding participants to answer the chairman in sequence
+            runChairmanIntervention(finalResponders, interventionText, 0);
+        });
+    }
+
+    function runChairmanIntervention(responders, interventionText, index = 0) {
+        if (index >= responders.length) {
+            document.getElementById('nexus-meeting-transcript').innerHTML += '<p class="text-green-500 font-bold text-center mt-10 uppercase tracking-widest">All called-out participants have responded to the Chairman.</p>';
+            return;
+        }
+
+        const responder = responders[index];
+        const transcript = document.getElementById('nexus-meeting-transcript');
+        const thinkingId = 'nexus-thinking-' + Date.now();
+        const thinkingHtml = `
+            <div id="${thinkingId}" class="flex gap-6 items-start animate-fade-in-up">
+                <div class="w-12 h-12 rounded-full bg-nexus-elevated border border-accent animate-pulse"></div>
+                <div class="nexus-thinking-indicator mt-4">
+                    <span>Reasoning</span>
+                    <div class="thinking-dot"></div><div class="thinking-dot"></div><div class="thinking-dot"></div>
+                </div>
+            </div>`;
+        transcript.innerHTML += thinkingHtml;
+        transcript.scrollTop = transcript.scrollHeight;
+
+        const meetingPayload = {
+            agent_id: responder.id,
+            agenda: "CHAIRMAN INTERVENTION: " + interventionText,
+            round: index + 1
+        };
+
+        nexusFetch( 'chat/meeting', 'POST', meetingPayload ).then(res => {
+            document.getElementById(thinkingId)?.remove();
+
+            const rawContent = res ? (res.content || res.message || res.error || '') : '';
+            const resContent = typeof rawContent === 'object' ? JSON.stringify(rawContent) : String(rawContent);
+
+            const colors = ['#7C3AED', '#0ea5e9', '#f59e0b', '#10b981', '#ef4444', '#f97316'];
+            const agentColor = colors[index % colors.length];
+            const agentName = res ? (res.agent_name || responder.name) : responder.name;
+            const positionName = res ? (res.position || responder.position) : responder.position;
+
+            const bubble = `<div class="flex gap-6 items-start animate-fade-in-up">
+                <div class="w-12 h-12 rounded-full shrink-0 flex items-center justify-center font-bold text-[#1e293b] shadow-xl" style="background-color: ${agentColor}">${escapeHTML(agentName[0])}</div>
+                <div class="flex-1 p-6 bg-[#f8fafc]/5 rounded-3xl border-l-4 shadow-2xl" style="border-color: ${agentColor}">
+                    <p class="text-[10px] text-gray-500 font-bold uppercase mb-2 tracking-widest">${escapeHTML(agentName)} • ${escapeHTML(positionName)}</p>
+                    <p class="text-sm text-gray-200 leading-relaxed whitespace-pre-wrap">${escapeHTML(resContent)}</p>
+                </div>
+            </div>`;
+            transcript.innerHTML += bubble;
+            transcript.scrollTop = transcript.scrollHeight;
+
+            setTimeout(() => runChairmanIntervention(responders, interventionText, index + 1), 2000);
         });
     }
 
     function runMeetingRound(invitees, agenda, round = 1) {
+        if (meetingPaused) {
+            return;
+        }
         if (round > 5) {
             document.getElementById('nexus-meeting-transcript').innerHTML += '<p class="text-green-500 font-bold text-center mt-10 uppercase tracking-widest">Meeting Concluded. Strategic Consensus Finalized.</p>';
             document.getElementById('nexus-meeting-summarize')?.classList.remove('hidden');
@@ -737,8 +933,6 @@ function initNexusAdminBridge() {
         chairmanMessage = ''; // Reset after injection
 
         nexusFetch('chat/meeting', 'POST', meetingPayload).then(res => {
-            console.log("[Meetings Hub Step Request]:", meetingPayload);
-            console.log("[Meetings Hub Step Response]:", res);
             document.getElementById(thinkingId)?.remove();
 
             const rawContent = res ? (res.content || res.message || res.error || '') : '';
@@ -928,13 +1122,11 @@ function initNexusAdminBridge() {
                 </div>`;
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
-            console.log("[Playground Chat Request]:", { employee_id: agentId, message: messageText, conversation_id: currentConversationId });
             nexusFetch('conversations', 'POST', {
                 conversation_id: currentConversationId,
                 employee_id: agentId,
                 message: messageText
             }).then(res => {
-                console.log("[Playground Chat Response]:", res);
                 document.getElementById(thinkingId)?.remove();
                 if (res && res.conversation_id) {
                     currentConversationId = res.conversation_id;
